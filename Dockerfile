@@ -6,7 +6,7 @@
 
 # Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
 
-FROM PYTHON_VERSION=3.13-alpine
+FROM python:3.13-alpine
 
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -14,6 +14,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Keeps Python from buffering stdout and stderr to avoid situations where
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
+
+ENV DEBUG="False"
+ENV ALLOWED_HOSTS="localhost,127.0.0.1"
 
 WORKDIR /djangogirls
 
@@ -41,13 +44,12 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 USER appuser
 
 # Copy the source code into the container.
-COPY djangogirls /djangogirls
+RUN ls -la
+COPY . /djangogirls
 
 # Expose the port that the application listens on.
 EXPOSE 8000
 
 # Run the application.
-RUN python manage.py runserver 0.0.0.0:8000
-
 # Executa o arquivo scripts/commands.sh
-CMD ["commands.sh"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
