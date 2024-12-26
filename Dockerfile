@@ -6,7 +6,7 @@
 
 # Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
 
-FROM python:3.13-alpine
+FROM python:3.13-slim
 
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -19,6 +19,11 @@ ENV DEBUG="False"
 ENV ALLOWED_HOSTS="localhost,127.0.0.1"
 
 WORKDIR /djangogirls
+
+# Install dependencies required for psycopg2
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc libpq-dev python3-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
@@ -40,16 +45,12 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
 
-# Switch to the non-privileged user to run the application.
-USER appuser
-
 # Copy the source code into the container.
 RUN ls -la
 COPY . /djangogirls
 
+# Switch to the non-privileged user to run the application.
+USER appuser
+
 # Expose the port that the application listens on.
 EXPOSE 8000
-
-# Run the application.
-# Executa o arquivo scripts/commands.sh
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

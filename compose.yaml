@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   djangoapp:
     container_name: djangogirls
@@ -8,13 +6,14 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ./djangogirls:/djangogirls
+      - ./djangogirls:/app
       - ./data/web/static:/data/web/static/
       - ./data/web/media:/data/web/media/
     env_file:
       - ./dotenv_files/.env
     depends_on:
       - psql
+    command: python manage.py runserver 0.0.0.0:8000
   psql:
     container_name: psql_djangogirls
     image: postgres:13-alpine
